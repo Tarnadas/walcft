@@ -1,0 +1,1 @@
+/Users/mbeekman/dev/walc/walcft/target/wasm32-unknown-unknown/release/libfungible_token.rlib: /Users/mbeekman/dev/walc/walcft/src/events.rs /Users/mbeekman/dev/walc/walcft/src/ft_core.rs /Users/mbeekman/dev/walc/walcft/src/internal.rs /Users/mbeekman/dev/walc/walcft/src/lib.rs /Users/mbeekman/dev/walc/walcft/src/metadata.rs /Users/mbeekman/dev/walc/walcft/src/storage.rs
