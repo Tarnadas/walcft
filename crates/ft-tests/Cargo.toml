@@ -1,0 +1,17 @@
+[package]
+name = "chess-test"
+version = "1.0.0"
+authors = ["Mario Reder <mario.reder@pm.me>"]
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+fungible-token = { path = "../ft" }
+futures = "0.3"
+near-contract-standards = "4"
+near-sdk = "4"
+owo-colors = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+workspaces = "0.7"
