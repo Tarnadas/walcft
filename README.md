@@ -1,37 +1,52 @@
 # walcft
 
+This repository contains the source for the fungible token contract for the WALC project, which is deployed on Near mainnet at address [walc.near](https://nearblocks.io/address/walc.near).
 
-NOTES
-near login
+In order to interact with the contract please install [Near CLI](https://github.com/near/near-cli).
 
-./build
+## Deployment
 
-near deploy --wasmFile out/contract.wasm --accountId $WALCTEST2_CONTRACT_ID
-
-near call $WALCTEST2_CONTRACT_ID new_default_meta '{"owner_id": "'$WALCTEST2_CONTRACT_ID'", "total_supply": "5000000000000000000000000000000000"}' --accountId $WALCTEST2_CONTRACT_ID
-near call $WALCTEST2_CONTRACT_ID storage_deposit '{"account_id": "'$WALCTEST2_CONTRACT_ID'"}' --accountId $WALCTEST2_CONTRACT_ID --amount 0.01
-
-near view $WALCTEST2_CONTRACT_ID ft_balance_of '{"account_id": "'$WALCTEST2_CONTRACT_ID'"}'
-
-
-####
-
-
+```sh
+# set environment to mainnet
 export NEAR_ENV=mainnet
+export CONTRACT_ID=walc.near
+
+# login with Near wallet
 near login
 
-export WALCFT_PRODUCTION_ID=walc.near
+# build contract
+./build_docker.sh
 
+# deploy WASM binary to Near
+near deploy --wasmFile out/fungible_token.wasm --accountId $CONTRACT_ID
 
+# initialize contract state
+near call $CONTRACT_ID new_default_meta '{"owner_id": "'$CONTRACT_ID'", "total_supply": "5000000000000000000000000000000000"}' --accountId $CONTRACT_ID
 
-near deploy --wasmFile out/contract.wasm --accountId $WALCFT_PRODUCTION_ID
+# check balance for owner
+near view $CONTRACT_ID ft_balance_of '{"account_id": "'$CONTRACT_ID'"}'
+```
 
-near call $WALCFT_PRODUCTION_ID new_default_meta '{"owner_id": "'$WALCFT_PRODUCTION_ID'", "total_supply": "5000000000000000000000000000000000"}' --accountId $WALCFT_PRODUCTION_ID
-near call $WALCFT_PRODUCTION_ID storage_deposit '{"account_id": "'$WALCFT_PRODUCTION_ID'"}' --accountId $WALCFT_PRODUCTION_ID --amount 0.01
+## Migration
 
-near view $WALCFT_PRODUCTION_ID ft_balance_of '{"account_id": "'$WALCFT_PRODUCTION_ID'"}'
+The v1 version of the contract, which is the first version deployed on Near mainnet needs a state migration for the new WASM binary to work. The reasoning behind the update can be read in this [Pull Request](https://github.com/walc-labs/walcft/pull/1).
 
+In order to run the migration on Near mainnet the new WASM binary needs to be deployed first. Then the `migrate` function needs to be run, which can only be done by the contract address itself.
 
+```sh
+# set environment to mainnet
+export NEAR_ENV=mainnet
+export CONTRACT_ID=walc.near
 
-14044213143421888300000000
+# login with Near wallet, if not already done
+#near login
 
+# deploy new WASM binary to Near
+near deploy --wasmFile out/fungible_token.wasm --accountId $CONTRACT_ID
+
+# migrate state
+near call $CONTRACT_ID migrate '' --accountId $CONTRACT_ID
+
+# verify that state migration worked, by calling any function without throwing an error
+near view $CONTRACT_ID ft_balance_of '{"account_id": "'$CONTRACT_ID'"}'
+```
