@@ -24,7 +24,7 @@ fi
 perl -i -pe 's/\["cdylib", "rlib"\]/\["cdylib"\]/' crates/ft/Cargo.toml
 
 docker start $NAME
-docker exec -it $NAME /bin/bash -c "rustup default 1.69; rustup target add wasm32-unknown-unknown; cargo build -p fungible-token --target wasm32-unknown-unknown --release"
+docker exec $NAME /bin/bash -c "rustup default 1.69; rustup target add wasm32-unknown-unknown; cargo build -p fungible-token --target wasm32-unknown-unknown --release"
 
 perl -i -pe 's/\["cdylib"\]/\["cdylib", "rlib"\]/' crates/ft/Cargo.toml
 
