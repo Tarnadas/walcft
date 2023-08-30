@@ -7,7 +7,7 @@ const TOTAL_SUPPLY: u128 = 100_000_000_000_000_000_000_000_000;
 #[tokio::test]
 async fn test_migrate() -> anyhow::Result<()> {
     let (worker, owner, contract) =
-        initialize_contracts(TOTAL_SUPPLY, Some("../../out/fungible_token.wasm")).await?;
+        initialize_contracts(TOTAL_SUPPLY, Some("./out/fungible_token_old.wasm")).await?;
 
     let user_0 = worker.dev_create_account().await?;
     let user_1 = worker.dev_create_account().await?;
@@ -32,6 +32,11 @@ async fn test_migrate() -> anyhow::Result<()> {
     let balance = view::ft_balance_of(&contract, owner.id()).await?;
     assert_eq!(balance.0, TOTAL_SUPPLY - 600);
 
+    contract
+        .as_account()
+        .deploy(include_bytes!("../out/fungible_token.wasm"))
+        .await?
+        .into_result()?;
     call::migrate(&contract, contract.as_account()).await?;
 
     let balance = view::ft_balance_of(&contract, user_0.id()).await?;

@@ -21,12 +21,12 @@ docker create \
      /bin/bash
 fi
 
-perl -i -pe 's/\["cdylib", "rlib"\]/\["cdylib"\]/' crates/ft/Cargo.toml
+perl -i -pe 's/\["cdylib", "rlib"\]/\["cdylib"\]/' Cargo.toml
 
 docker start $NAME
 docker exec $NAME /bin/bash -c "rustup default 1.69; rustup target add wasm32-unknown-unknown; cargo build -p fungible-token --target wasm32-unknown-unknown --release"
 
-perl -i -pe 's/\["cdylib"\]/\["cdylib", "rlib"\]/' crates/ft/Cargo.toml
+perl -i -pe 's/\["cdylib"\]/\["cdylib", "rlib"\]/' Cargo.toml
 
 mkdir -p out
 cp $DIR/target/wasm32-unknown-unknown/release/*.wasm $DIR/out/

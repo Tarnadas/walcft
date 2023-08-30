@@ -49,7 +49,7 @@ pub async fn initialize_contracts(
         .create_tla_and_deploy(
             "ft.test.near".parse()?,
             key,
-            &fs::read(path.unwrap_or("../../out/fungible_token.wasm")).await?,
+            &fs::read(path.unwrap_or("./out/fungible_token.wasm")).await?,
         )
         .await?
         .into_result()?;
