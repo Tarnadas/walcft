@@ -14,8 +14,8 @@
 //! or [`FtBurn::emit_many`] respectively.
 
 use near_sdk::json_types::U128;
-use near_sdk::AccountId;
 use near_sdk::serde::Serialize;
+use near_sdk::AccountId;
 
 use near_sdk::env;
 
@@ -31,7 +31,9 @@ impl<'a> NearEvent<'a> {
     fn to_json_string(&self) -> String {
         // Events cannot fail to serialize so fine to panic on error
         #[allow(clippy::redundant_closure)]
-        serde_json::to_string(self).ok().unwrap_or_else(|| env::abort())
+        serde_json::to_string(self)
+            .ok()
+            .unwrap_or_else(|| env::abort())
     }
 
     fn to_json_event_string(&self) -> String {
@@ -44,7 +46,6 @@ impl<'a> NearEvent<'a> {
         near_sdk::env::log_str(&self.to_json_event_string());
     }
 }
-
 
 /// Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit).
 #[must_use]
@@ -113,7 +114,10 @@ enum Nep141EventKind<'a> {
 }
 
 fn new_141<'a>(version: &'static str, event_kind: Nep141EventKind<'a>) -> NearEvent<'a> {
-    NearEvent::Nep141(Nep141Event { version, event_kind })
+    NearEvent::Nep141(Nep141Event {
+        version,
+        event_kind,
+    })
 }
 
 fn new_141_v1(event_kind: Nep141EventKind) -> NearEvent {

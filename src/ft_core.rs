@@ -1,4 +1,4 @@
-use near_sdk::{Gas, ext_contract, PromiseOrValue, assert_one_yocto, PromiseResult};
+use near_sdk::{assert_one_yocto, ext_contract, Gas, PromiseOrValue, PromiseResult};
 
 use crate::*;
 
@@ -204,10 +204,15 @@ impl Contract {
             if receiver_balance > 0 {
                 // The amount to refund is the smaller of the unused amount and the receiver's balance as we can only refund up to what the receiver currently has.
                 let refund_amount = std::cmp::min(receiver_balance, unused_amount);
-                
+
                 // Refund the sender for the unused amount.
-                self.internal_transfer(&receiver_id, &sender_id, refund_amount, Some("Refund".to_string()));
-                
+                self.internal_transfer(
+                    &receiver_id,
+                    &sender_id,
+                    refund_amount,
+                    Some("Refund".to_string()),
+                );
+
                 // Return what was actually used (the amount sent - refund)
                 let used_amount = amount
                     .checked_sub(refund_amount)

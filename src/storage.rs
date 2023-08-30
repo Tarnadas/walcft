@@ -1,7 +1,7 @@
-use near_sdk::json_types::U128;
-use near_sdk::{env, log, AccountId, Balance, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use near_sdk::json_types::U128;
 use near_sdk::serde::{Deserialize, Serialize};
+use near_sdk::{env, log, AccountId, Balance, Promise};
 
 use crate::*;
 
@@ -88,13 +88,13 @@ impl StorageManagement for Contract {
         let amount: Balance = env::attached_deposit();
         // If an account was specified, use that. Otherwise, use the predecessor account.
         let account_id = account_id.unwrap_or_else(env::predecessor_account_id);
-        
+
         // If the account is already registered, refund the deposit.
         if self.accounts.contains_key(&account_id) {
             log!("The account is already registered, refunding the deposit");
             if amount > 0 {
                 Promise::new(env::predecessor_account_id()).transfer(amount);
-            } 
+            }
         // Register the account and refund any excess $NEAR
         } else {
             // Get the minimum required storage and ensure the deposit is at least that amount
@@ -113,14 +113,17 @@ impl StorageManagement for Contract {
         }
 
         // Return the storage balance of the account
-        StorageBalance { total: self.storage_balance_bounds().min, available: 0.into() }
+        StorageBalance {
+            total: self.storage_balance_bounds().min,
+            available: 0.into(),
+        }
     }
 
     fn storage_balance_bounds(&self) -> StorageBalanceBounds {
         // Calculate the required storage balance by taking the bytes for the longest account ID and multiplying by the current byte cost
         let required_storage_balance =
             Balance::from(self.bytes_for_longest_account_id) * env::storage_byte_cost();
-        
+
         // Storage balance bounds will have min == max == required_storage_balance
         StorageBalanceBounds {
             min: required_storage_balance.into(),
@@ -131,7 +134,10 @@ impl StorageManagement for Contract {
     fn storage_balance_of(&self, account_id: AccountId) -> Option<StorageBalance> {
         // Get the storage balance of the account. Available will always be 0 since you can't overpay for storage.
         if self.accounts.contains_key(&account_id) {
-            Some(StorageBalance { total: self.storage_balance_bounds().min, available: 0.into() })
+            Some(StorageBalance {
+                total: self.storage_balance_bounds().min,
+                available: 0.into(),
+            })
         } else {
             None
         }
