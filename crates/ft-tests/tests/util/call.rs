@@ -9,13 +9,11 @@ use workspaces::{
 pub async fn migrate(
     contract: &Contract,
     sender: &Account,
-    account_ids: Vec<&AccountId>,
 ) -> anyhow::Result<ExecutionResult<Value>> {
     log_tx_result(
         Some("migrate"),
         sender
             .call(contract.id(), "migrate")
-            .args_json((account_ids,))
             .max_gas()
             .transact()
             .await?,

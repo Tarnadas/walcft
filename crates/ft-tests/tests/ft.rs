@@ -32,12 +32,7 @@ async fn test_migrate() -> anyhow::Result<()> {
     let balance = view::ft_balance_of(&contract, owner.id()).await?;
     assert_eq!(balance.0, TOTAL_SUPPLY - 600);
 
-    call::migrate(
-        &contract,
-        contract.as_account(),
-        vec![owner.id(), user_0.id(), user_1.id(), user_2.id()],
-    )
-    .await?;
+    call::migrate(&contract, contract.as_account()).await?;
 
     let balance = view::ft_balance_of(&contract, user_0.id()).await?;
     assert_eq!(balance.0, 100);
