@@ -80,18 +80,16 @@ pub async fn initialize_contracts(
 pub fn log_tx_result(
     ident: Option<&str>,
     res: ExecutionFinalResult,
-) -> anyhow::Result<(ExecutionResult<Value>, Vec<event::ContractEvent>)> {
+) -> anyhow::Result<ExecutionResult<Value>> {
     for failure in res.receipt_failures() {
         print_log!("{:#?}", failure.bright_red());
     }
-    let mut events = vec![];
     for outcome in res.receipt_outcomes() {
         if !outcome.logs.is_empty() {
             for log in outcome.logs.iter() {
                 if log.starts_with("EVENT_JSON:") {
                     let event: event::ContractEvent =
                         serde_json::from_str(&log.replace("EVENT_JSON:", ""))?;
-                    events.push(event.clone());
                     print_log!(
                         "{}: {}\n{}",
                         "account".bright_cyan(),
@@ -114,7 +112,7 @@ pub fn log_tx_result(
             "TGas".bright_magenta().bold()
         );
     }
-    Ok((res.into_result()?, events))
+    Ok(res.into_result()?)
 }
 
 pub fn log_view_result(res: ViewResultDetails) -> anyhow::Result<ViewResultDetails> {

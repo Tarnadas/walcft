@@ -7,7 +7,6 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 fungible-token = { path = "../ft" }
-futures = "0.3"
 near-contract-standards = "4"
 near-sdk = "4"
 owo-colors = "3"
