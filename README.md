@@ -55,7 +55,9 @@ near view $CONTRACT_ID ft_balance_of '{"account_id": "'$CONTRACT_ID'"}'
 
 The WALC Sputnik DAO contract has been set up with the contract address [walc.sputnik-dao.near](https://nearblocks.io/address/walc.sputnik-dao.near). You can either use [AstroDAO UI](https://app.astrodao.com/dao/walc.sputnik-dao.near) or [Astra++](https://near.org/astraplusplus.ndctools.near/widget/home?daoId=walc.sputnik-dao.near&page=dao) to interact with it.
 
-Before the `walc.near` can be locked, the upgrade and migration to the latest WASM binary needs to be done as explained above. Afterwards the following steps need to be done:
+Before the `walc.near` can be locked, the upgrade and migration to the latest WASM binary needs to be done as explained above. The token bridging via [Portal Bridge](portalbridge.com) should also be done before locking. In theory it would be possible to do the bridging after locking, but it will no longer be possible to use Portal Bridge's UI for that.
+
+Afterwards the following steps need to be done:
 
 ```sh
 # set environment to mainnet
