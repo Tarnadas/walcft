@@ -3,14 +3,15 @@ pub mod event;
 pub mod view;
 
 use near_contract_standards::fungible_token::metadata::{FungibleTokenMetadata, FT_METADATA_SPEC};
-use near_sdk::json_types::U128;
+use near_sdk::json_types::{Base58CryptoHash, Base64VecU8, U128, U64};
 use owo_colors::OwoColorize;
+use serde::Serialize;
 use tokio::fs;
 use workspaces::{
     network::Sandbox,
     result::{ExecutionFinalResult, ExecutionResult, Value, ViewResultDetails},
     types::{KeyType, SecretKey},
-    Account, Contract, Worker,
+    Account, AccountId, Contract, Worker,
 };
 
 #[macro_export]
@@ -36,14 +37,75 @@ macro_rules! print_log {
     };
 }
 
+#[derive(Serialize)]
+pub struct DaoConfig {
+    pub name: String,
+    pub purpose: String,
+    pub metadata: String,
+}
+
+#[derive(Serialize)]
+pub struct DaoPolicy(pub Vec<AccountId>);
+
+#[derive(Serialize)]
+pub struct ProposalInput {
+    pub description: String,
+    pub kind: ProposalKind,
+}
+
+#[allow(unused)]
+#[derive(Serialize)]
+pub enum ProposalKind {
+    /// Change the DAO config.
+    ChangeConfig { config: DaoConfig },
+    /// Change the full policy.
+    ChangePolicy { policy: DaoPolicy },
+    /// Add member to given role in the policy. This is short cut to updating the whole policy.
+    AddMemberToRole { member_id: AccountId, role: String },
+    /// Remove member to given role in the policy. This is short cut to updating the whole policy.
+    RemoveMemberFromRole { member_id: AccountId, role: String },
+    /// Calls `receiver_id` with list of method names in a single promise.
+    /// Allows this contract to execute any arbitrary set of actions in other contracts.
+    FunctionCall {
+        receiver_id: AccountId,
+        actions: Vec<ActionCall>,
+    },
+    /// Upgrade this contract with given hash from blob store.
+    UpgradeSelf { hash: Base58CryptoHash },
+    /// Upgrade another contract, by calling method with the code from given hash from blob store.
+    UpgradeRemote {
+        receiver_id: AccountId,
+        method_name: String,
+        hash: Base58CryptoHash,
+    },
+}
+
+#[derive(Serialize)]
+pub struct ActionCall {
+    pub method_name: String,
+    pub args: Base64VecU8,
+    pub deposit: U128,
+    pub gas: U64,
+}
+
+#[allow(unused)]
+#[derive(Serialize)]
+pub enum Action {
+    AddProposal,
+    RemoveProposal,
+    VoteApprove,
+    VoteReject,
+    VoteRemove,
+    Finalize,
+    MoveToHub,
+}
+
 pub async fn initialize_contracts(
+    worker: &Worker<Sandbox>,
+    owner: &Account,
     total_supply: u128,
     path: Option<&'static str>,
-) -> anyhow::Result<(Worker<Sandbox>, Account, Contract)> {
-    let worker = workspaces::sandbox().await?;
-
-    let owner = worker.dev_create_account().await?;
-
+) -> anyhow::Result<Contract> {
     let key = SecretKey::from_random(KeyType::ED25519);
     let contract = worker
         .create_tla_and_deploy(
@@ -74,7 +136,7 @@ pub async fn initialize_contracts(
         .await?
         .into_result()?;
 
-    Ok((worker, owner, contract))
+    Ok(contract)
 }
 
 pub fn log_tx_result(
