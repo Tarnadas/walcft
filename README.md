@@ -71,7 +71,7 @@ near view $CONTRACT_ID ft_balance_of '{ "account_id": "'$CONTRACT_ID'" }'
 near call $CONTRACT_ID ft_transfer '{ "receiver_id": "walc.sputnik-dao.near", "amount": "'$AMOUNT'" }' --accountId $CONTRACT_ID
 
 # print your `walc.near` public key
-cat ~/.near-credentials/mainnet/chess-game.near.json | jq '.public_key'
+cat ~/.near-credentials/mainnet/walc.near.json | jq '.public_key'
 
 # get list of all access keys
 curl https://rpc.mainnet.near.org --request POST --header 'Content-Type: application/json' --data '{
