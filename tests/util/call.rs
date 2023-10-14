@@ -6,13 +6,13 @@ use workspaces::{
     Account, AccountId, Contract,
 };
 
-pub async fn migrate(
+pub async fn migrate_old(
     contract: &Contract,
     sender: &Account,
     owner: &AccountId,
 ) -> anyhow::Result<ExecutionResult<Value>> {
     log_tx_result(
-        Some("migrate"),
+        Some("migrate_old"),
         sender
             .call(contract.id(), "migrate")
             .args_json((owner,))
@@ -21,6 +21,20 @@ pub async fn migrate(
             .await?,
     )
 }
+
+// pub async fn migrate(
+//     contract: &Contract,
+//     sender: &Account,
+// ) -> anyhow::Result<ExecutionResult<Value>> {
+//     log_tx_result(
+//         Some("migrate"),
+//         sender
+//             .call(contract.id(), "migrate")
+//             .max_gas()
+//             .transact()
+//             .await?,
+//     )
+// }
 
 pub async fn storage_deposit(
     contract: &Contract,
@@ -98,6 +112,7 @@ pub async fn add_proposal(
     sender: &Account,
     dao: &AccountId,
     proposal: ProposalInput,
+    deposit: Option<u128>,
 ) -> anyhow::Result<u64> {
     Ok(log_tx_result(
         Some("DAO: add_proposal"),
@@ -105,7 +120,7 @@ pub async fn add_proposal(
             .call(dao, "add_proposal")
             .args_json((proposal,))
             .max_gas()
-            .deposit(1_000_000_000_000_000_000_000_000)
+            .deposit(deposit.unwrap_or(1_000_000_000_000_000_000_000_000))
             .transact()
             .await?,
     )?

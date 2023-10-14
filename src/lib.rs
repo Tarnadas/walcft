@@ -93,17 +93,14 @@ impl Contract {
         }
     }
 
-    #[private]
-    #[init(ignore_state)]
-    pub fn migrate(owner: AccountId) -> Self {
-        let state: OldContract = env::state_read().unwrap();
-        let token = FungibleToken::new(StorageKey::Accounts.try_to_vec().unwrap());
-
-        Self {
-            owner,
-            token,
-            metadata: state.metadata,
-        }
+    pub fn migrate(&mut self) {
+        require!(
+            env::predecessor_account_id() == self.owner,
+            "Only account owner can update the code"
+        );
+        // 5 billion total supply.
+        // The total supply didn't get migrated properly, so need to fix it here.
+        self.token.total_supply = 5_000_000_000_000_000_000_000_000_000_000_000;
     }
 
     pub fn upgrade(&self) -> Promise {
@@ -116,6 +113,7 @@ impl Contract {
 
         Promise::new(env::current_account_id())
             .deploy_contract(code)
+            .then(Self::ext(env::current_account_id()).migrate())
             .as_return()
     }
 }

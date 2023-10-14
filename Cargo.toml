@@ -18,6 +18,7 @@ serde_json = "1"
 
 [dev-dependencies]
 anyhow = "1"
+dotenv = "0.15"
 owo-colors = "3"
 tokio = { version = "1", features = ["full"] }
 workspaces = "0.7"
