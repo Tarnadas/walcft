@@ -26,14 +26,14 @@ async fn run_dao_upgrade() -> anyhow::Result<()> {
         &council,
         &dao_contract_id,
         ProposalInput {
-            description: "Upgrade contract. Preparation for `total_supply` fix. This proposal needs to be voted FIRST".to_string(),
+            description: "Upgrade contract".to_string(),
             kind: ProposalKind::UpgradeRemote {
                 receiver_id: contract_id.clone(),
                 method_name: "upgrade".to_string(),
                 hash,
             },
         },
-        Some(100_000_000_000_000_000_000_000)
+        Some(100_000_000_000_000_000_000_000),
     )
     .await?;
     call::act_proposal(&council, &dao_contract_id, proposal_id, Action::VoteApprove).await?;
@@ -42,7 +42,7 @@ async fn run_dao_upgrade() -> anyhow::Result<()> {
         &council,
         &dao_contract_id,
         ProposalInput {
-            description: "Migrate contract. `total_supply` fix execution. This proposal needs to be voted LAST".to_string(),
+            description: "Migrate contract".to_string(),
             kind: ProposalKind::FunctionCall {
                 receiver_id: contract_id,
                 actions: vec![ActionCall {
@@ -53,7 +53,7 @@ async fn run_dao_upgrade() -> anyhow::Result<()> {
                 }],
             },
         },
-        Some(100_000_000_000_000_000_000_000)
+        Some(100_000_000_000_000_000_000_000),
     )
     .await?;
     call::act_proposal(&council, &dao_contract_id, proposal_id, Action::VoteApprove).await?;

@@ -1,5 +1,7 @@
 use near_contract_standards::fungible_token::events::FtMint;
-use near_contract_standards::fungible_token::metadata::FungibleTokenMetadata;
+use near_contract_standards::fungible_token::metadata::{
+    FungibleTokenMetadata, FungibleTokenMetadataProvider,
+};
 use near_contract_standards::fungible_token::FungibleToken;
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LazyOption, LookupMap};
@@ -115,6 +117,21 @@ impl Contract {
             .deploy_contract(code)
             .then(Self::ext(env::current_account_id()).migrate())
             .as_return()
+    }
+}
+
+#[near_bindgen]
+impl FungibleTokenMetadataProvider for Contract {
+    fn ft_metadata(&self) -> FungibleTokenMetadata {
+        FungibleTokenMetadata {
+            spec: FT_METADATA_SPEC.to_string(),
+            name: "WALC".to_string(),
+            symbol: "WALC".to_string(),
+            icon: Some(DATA_IMAGE_SVG_GT_ICON.to_string()),
+            reference: None,
+            reference_hash: None,
+            decimals: 24,
+        }
     }
 }
 
